@@ -1,0 +1,42 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model BloodBank.Models.Donor
+
+<h2>Add Donor</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div style="color:red">
+        <ul>
+            @foreach (var state in ViewData.ModelState.Values)
+            {
+                foreach (var error in state.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
+<form method="post" action="/Donor/Create">
+    <label>Full Name:</label><br />
+    <input type="text" name="FullName" value="@Model?.FullName" /><br /><br />
+
+    <label>Blood Group:</label><br />
+    <input type="text" name="BloodGroup" value="@Model?.BloodGroup" /><br /><br />
+
+    <label>Contact No:</label><br />
+    <input type="text" name="ContactNo" value="@Model?.ContactNo" /><br /><br />
+
+    <label>City:</label><br />
+    <input type="text" name="City" value="@Model?.City" /><br /><br />
+
+    <label>Last Donation Date:</label><br />
+    <input type="date" name="LastDonationDate" value="@Model?.LastDonationDate" /><br /><br />
+
+    <button type="submit">Save</button>
+</form>

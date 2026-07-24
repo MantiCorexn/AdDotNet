@@ -1,0 +1,22 @@
+﻿@model List<BloodBank.Models.Donor>
+
+<h2>Donors Sorted by Last Donation Date (Most Recent First)</h2>
+
+<table border="1">
+    <tr>
+        <th>Full Name</th>
+        <th>Blood Group</th>
+        <th>Last Donation Date</th>
+    </tr>
+    @foreach (var donor in Model)
+    {
+        <tr>
+            <td>@donor.FullName</td>
+            <td>@donor.BloodGroup</td>
+            <td>@donor.LastDonationDate</td>
+        </tr>
+    }
+</table>
+
+<br />
+<a href="/Donor">Back to Donors</a>

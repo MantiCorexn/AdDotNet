@@ -1,0 +1,36 @@
+﻿@model List<BloodBank.Models.Donor>
+
+<h2>Donors</h2>
+
+<a href="/Donor/Create">Add New Donor</a>
+
+<table border="1">
+    <tr>
+        <th>Full Name</th>
+        <th>Blood Group</th>
+        <th>Contact</th>
+        <th>City</th>
+        <th>Last Donation</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var donor in Model)
+    {
+        <tr>
+            <td>@donor.FullName</td>
+            <td>@donor.BloodGroup</td>
+            <td>@donor.ContactNo</td>
+            <td>@donor.City</td>
+            <td>@donor.LastDonationDate</td>
+            <td>
+                <a href="/Donor/Edit/@donor.DonorId">Edit</a> |
+                <a href="/Donor/Delete/@donor.DonorId">Delete</a>
+            </td>
+        </tr>
+    }
+    <p>
+        <a href="/Reports/FilterByBloodGroup">Filter by Blood Group</a> |
+        <a href="/Reports/SortByLastDonation">Sort by Last Donation</a> |
+        <a href="/Reports/DonorDonationCounts">Donation Counts</a> |
+        <a href="/Reports/TotalVolume">Total Volume</a>
+    </p>
+</table>
