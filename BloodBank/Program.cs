@@ -11,6 +11,15 @@ builder.Services.AddDbContext<BloodBankDbContext>(options =>
 
 var app = builder.Build();
 
+// In development, create the database and tables on first run so the app works right after cloning.
+// (Does nothing if the database already exists.)
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<BloodBankDbContext>();
+    db.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
