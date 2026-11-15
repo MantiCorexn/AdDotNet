@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BloodBank.Models;
+﻿using BloodBank.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BloodBank.Controllers;
 
@@ -12,41 +13,48 @@ public class ReportsController : Controller
         _context = context;
     }
 
-    public IActionResult FilterByBloodGroup(string bloodGroup)
+    public async Task<IActionResult> FilterByBloodGroup(string? bloodGroup)
     {
         var donors = string.IsNullOrWhiteSpace(bloodGroup)
             ? new List<Donor>()
-            : _context.Donors.Where(d => d.BloodGroup == bloodGroup).ToList();
+            : await _context.Donors
+                .AsNoTracking()
+                .Where(d => d.BloodGroup == bloodGroup)
+                .OrderBy(d => d.FullName)
+                .ToListAsync();
 
         ViewData["SelectedGroup"] = bloodGroup;
         return View(donors);
     }
 
-    public IActionResult SortByLastDonation()
+    public async Task<IActionResult> SortByLastDonation()
     {
-        var donors = _context.Donors
+        var donors = await _context.Donors
+            .AsNoTracking()
             .OrderByDescending(d => d.LastDonationDate)
-            .ToList();
+            .ToListAsync();
 
         return View(donors);
     }
 
-    public IActionResult DonorDonationCounts()
+    public async Task<IActionResult> DonorDonationCounts()
     {
-        var result = _context.Donors
+        var result = await _context.Donors
+            .AsNoTracking()
             .Select(d => new DonorCountViewModel
             {
                 FullName = d.FullName,
                 DonationCount = d.Donations.Count()
             })
-            .ToList();
+            .OrderByDescending(r => r.DonationCount)
+            .ToListAsync();
 
         return View(result);
     }
 
-    public IActionResult TotalVolume()
+    public async Task<IActionResult> TotalVolume()
     {
-        var total = _context.Donations.Sum(d => d.VolumeMl);
+        var total = await _context.Donations.SumAsync(d => d.VolumeMl);
         ViewData["TotalVolume"] = total;
         return View();
     }

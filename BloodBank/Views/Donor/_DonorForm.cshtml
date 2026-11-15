@@ -1,0 +1,35 @@
+@model BloodBank.Models.Donor
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="mb-3">
+    <label asp-for="FullName" class="form-label"></label>
+    <input asp-for="FullName" class="form-control" />
+    <span asp-validation-for="FullName" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="BloodGroup" class="form-label"></label>
+    <select asp-for="BloodGroup" asp-items="@(new SelectList(BloodGroups.All))" class="form-select">
+        <option value="">-- Select --</option>
+    </select>
+    <span asp-validation-for="BloodGroup" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="ContactNo" class="form-label"></label>
+    <input asp-for="ContactNo" class="form-control" />
+    <span asp-validation-for="ContactNo" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="City" class="form-label"></label>
+    <input asp-for="City" class="form-control" />
+    <span asp-validation-for="City" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="LastDonationDate" class="form-label"></label>
+    <input asp-for="LastDonationDate" type="date" class="form-control" />
+    <span asp-validation-for="LastDonationDate" class="text-danger"></span>
+</div>

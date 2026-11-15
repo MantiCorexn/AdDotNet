@@ -1,36 +1,53 @@
 ﻿@model List<BloodBank.Models.Donor>
+@{
+    ViewData["Title"] = "Donors";
+}
 
 <h2>Donors</h2>
 
-<a href="/Donor/Create">Add New Donor</a>
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Donor</a>
+</p>
 
-<table border="1">
-    <tr>
-        <th>Full Name</th>
-        <th>Blood Group</th>
-        <th>Contact</th>
-        <th>City</th>
-        <th>Last Donation</th>
-        <th>Actions</th>
-    </tr>
-    @foreach (var donor in Model)
-    {
-        <tr>
-            <td>@donor.FullName</td>
-            <td>@donor.BloodGroup</td>
-            <td>@donor.ContactNo</td>
-            <td>@donor.City</td>
-            <td>@donor.LastDonationDate</td>
-            <td>
-                <a href="/Donor/Edit/@donor.DonorId">Edit</a> |
-                <a href="/Donor/Delete/@donor.DonorId">Delete</a>
-            </td>
-        </tr>
-    }
-    <p>
-        <a href="/Reports/FilterByBloodGroup">Filter by Blood Group</a> |
-        <a href="/Reports/SortByLastDonation">Sort by Last Donation</a> |
-        <a href="/Reports/DonorDonationCounts">Donation Counts</a> |
-        <a href="/Reports/TotalVolume">Total Volume</a>
-    </p>
-</table>
+<p>
+    <a asp-controller="Reports" asp-action="FilterByBloodGroup">Filter by Blood Group</a> |
+    <a asp-controller="Reports" asp-action="SortByLastDonation">Sort by Last Donation</a> |
+    <a asp-controller="Reports" asp-action="DonorDonationCounts">Donation Counts</a> |
+    <a asp-controller="Reports" asp-action="TotalVolume">Total Volume</a>
+</p>
+
+@if (Model.Count == 0)
+{
+    <p>No donors yet.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Blood Group</th>
+                <th>Contact</th>
+                <th>City</th>
+                <th>Last Donation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var donor in Model)
+            {
+                <tr>
+                    <td>@donor.FullName</td>
+                    <td>@donor.BloodGroup</td>
+                    <td>@donor.ContactNo</td>
+                    <td>@donor.City</td>
+                    <td>@donor.LastDonationDate</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@donor.DonorId">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@donor.DonorId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

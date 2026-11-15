@@ -1,11 +1,13 @@
-﻿@model List<BloodBank.Models.Donor>
+@model List<BloodBank.Models.Donor>
 
 <h2>Filter Donors by Blood Group</h2>
 
-<form method="get" action="/Reports/FilterByBloodGroup">
-    <label>Blood Group:</label>
-    <input type="text" name="bloodGroup" value="@ViewData["SelectedGroup"]" placeholder="e.g. AB+" />
-    <button type="submit">Filter</button>
+<form asp-action="FilterByBloodGroup" method="get" class="d-flex gap-2" style="max-width: 360px">
+    <select name="bloodGroup" class="form-select"
+            asp-items="@(new SelectList(BloodGroups.All, ViewData["SelectedGroup"] as string))">
+        <option value="">-- Select --</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
 </form>
 
 <br />
@@ -36,4 +38,4 @@ else
 }
 
 <br />
-<a href="/Donor">Back to Donors</a>
+<a asp-controller="Donor" asp-action="Index">Back to Donors</a>

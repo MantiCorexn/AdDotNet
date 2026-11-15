@@ -1,15 +1,24 @@
 ﻿@model BloodBank.Models.Donor
+@{
+    ViewData["Title"] = "Delete Donor";
+}
 
 <h2>Delete Donor</h2>
 
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
 <p>Are you sure you want to delete this donor?</p>
 
-<p><strong>Name:</strong> @Model.FullName</p>
-<p><strong>Blood Group:</strong> @Model.BloodGroup</p>
-<p><strong>City:</strong> @Model.City</p>
+<dl class="row">
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.FullName)</dt>
+    <dd class="col-sm-9">@Model.FullName</dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.BloodGroup)</dt>
+    <dd class="col-sm-9">@Model.BloodGroup</dd>
+    <dt class="col-sm-3">@Html.DisplayNameFor(m => m.City)</dt>
+    <dd class="col-sm-9">@Model.City</dd>
+</dl>
 
-<form method="post" action="/Donor/Delete/@Model.DonorId">
-    <button type="submit">Confirm Delete</button>
+<form asp-action="Delete" asp-route-id="@Model.DonorId" method="post">
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a asp-action="Index" class="btn btn-link">Cancel</a>
 </form>
-
-<a href="/Donor">Cancel</a>

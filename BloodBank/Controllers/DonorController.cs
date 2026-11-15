@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BloodBank.Models;
+﻿using BloodBank.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BloodBank.Controllers;
 
@@ -12,9 +13,13 @@ public class DonorController : Controller
         _context = context;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var donors = _context.Donors.ToList();
+        var donors = await _context.Donors
+            .AsNoTracking()
+            .OrderBy(d => d.FullName)
+            .ToListAsync();
+
         return View(donors);
     }
 
@@ -24,64 +29,70 @@ public class DonorController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(Donor donor)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(
+        [Bind(nameof(Donor.FullName), nameof(Donor.BloodGroup), nameof(Donor.ContactNo),
+              nameof(Donor.City), nameof(Donor.LastDonationDate))] Donor donor)
     {
-        if (string.IsNullOrWhiteSpace(donor.FullName))
-            ModelState.AddModelError("FullName", "Full name is required.");
-
-        if (string.IsNullOrWhiteSpace(donor.BloodGroup))
-            ModelState.AddModelError("BloodGroup", "Blood group is required.");
-
         if (!ModelState.IsValid)
             return View(donor);
 
         _context.Donors.Add(donor);
-        _context.SaveChanges();
-        return RedirectToAction("Index");
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
     }
 
-    public IActionResult Edit(int id)
+    public async Task<IActionResult> Edit(int id)
     {
-        var donor = _context.Donors.Find(id);
+        var donor = await _context.Donors.FindAsync(id);
         if (donor == null) return NotFound();
         return View(donor);
     }
 
-    [HttpPost]
-    public IActionResult Edit(int id, Donor donor)
+    [HttpPost, ActionName("Edit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditPost(int id)
     {
-        if (id != donor.DonorId) return NotFound();
+        // Load the existing row and copy over only the fields the form is allowed to change.
+        // This prevents overposting: extra fields in the request are ignored.
+        var donor = await _context.Donors.FindAsync(id);
+        if (donor == null) return NotFound();
 
-        if (string.IsNullOrWhiteSpace(donor.FullName))
-            ModelState.AddModelError("FullName", "Full name is required.");
+        var updated = await TryUpdateModelAsync(donor, prefix: "",
+            d => d.FullName, d => d.BloodGroup, d => d.ContactNo,
+            d => d.City, d => d.LastDonationDate);
 
-        if (string.IsNullOrWhiteSpace(donor.BloodGroup))
-            ModelState.AddModelError("BloodGroup", "Blood group is required.");
-
-        if (!ModelState.IsValid)
+        if (!updated || !ModelState.IsValid)
             return View(donor);
 
-        _context.Donors.Update(donor);
-        _context.SaveChanges();
-        return RedirectToAction("Index");
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
     }
 
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var donor = _context.Donors.Find(id);
+        var donor = await _context.Donors.AsNoTracking().FirstOrDefaultAsync(d => d.DonorId == id);
         if (donor == null) return NotFound();
         return View(donor);
     }
 
     [HttpPost, ActionName("Delete")]
-    public IActionResult DeleteConfirmed(int id)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var donor = _context.Donors.Find(id);
-        if (donor != null)
+        var donor = await _context.Donors.FindAsync(id);
+        if (donor == null) return RedirectToAction(nameof(Index));
+
+        // Donations reference the donor, so deleting a donor with history would violate the foreign key.
+        if (await _context.Donations.AnyAsync(d => d.DonorId == id))
         {
-            _context.Donors.Remove(donor);
-            _context.SaveChanges();
+            ModelState.AddModelError(string.Empty,
+                "This donor has recorded donations and cannot be deleted.");
+            return View("Delete", donor);
         }
-        return RedirectToAction("Index");
+
+        _context.Donors.Remove(donor);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
     }
 }
